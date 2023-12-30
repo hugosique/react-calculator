@@ -28,34 +28,46 @@ export default class Calculator extends Component {
     }
 
     setOperation(operation) {
-        if(this.state.current === 0) {
-            this.setState({operation, current: 1, clearDisplay: true });
+        if (this.state.current === 0) {
+            this.setState({ operation, current: 1, clearDisplay: true });
         } else {
-            const equals = operation === '='
-            const currentOperation = this.setState.operation
-
+            const equals = operation === '=';
+            const currentOperation = this.state.operation;
+    
             const values = [...this.state.values];
+            values[1] = parseFloat(this.state.displayValue);
+    
             try {
-                values[0] = eval(`${values[0]} ${currentOperation} ${values[1]}`);
-                if(isNaN(values[0]) || !isFinite(values[0])) {
-                    this.clearMemory()
-                    return
+                switch (currentOperation) {
+                    case '+':
+                        values[0] += values[1];
+                        break;
+                    case '-':
+                        values[0] -= values[1];
+                        break;
+                    case '*':
+                        values[0] *= values[1];
+                        break;
+                    case '/':
+                        values[0] /= values[1];
+                        break;
+                    default:
+                        break;
                 }
-            } catch (e) {
-                values[0] = this.state.values[0]
-            };
-
-            values[1] = 0;
-
+            } catch (error) {
+                this.clearMemory();
+                return;
+            }
+    
             this.setState({
-                displayValue: values[0],
+                displayValue: values[0].toString(),
                 operation: equals ? null : operation,
                 current: equals ? 0 : 1,
                 clearDisplay: !equals,
-                values
-            })
-        };
-    }
+                values,
+            });
+        }
+    }    
 
     addDigit(n) {
         if(n === '.' && this.state.displayValue.includes('.')) {
